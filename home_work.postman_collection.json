@@ -1,0 +1,232 @@
+{
+	"info": {
+		"_postman_id": "4a290370-9db1-4607-87f4-5c4fa05fc7c1",
+		"name": "home_work",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29102039",
+		"_collection_link": "https://blue-space-873979.postman.co/workspace/Asik~b02a290d-46c3-4028-95c7-fb66b7a5e6e1/collection/29102039-4a290370-9db1-4607-87f4-5c4fa05fc7c1?action=share&source=collection_link&creator=29102039"
+	},
+	"item": [
+		{
+			"name": "create_student",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json()\r",
+							"pm.environment.set(\"id\" , jsonData.id)\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"//First_Name\r",
+							"var firstName = pm.variables.replaceIn(\"{{$randomFirstName}}\")\r",
+							"console.log(\"First Name is: \"+firstName)\r",
+							"pm.environment.set(\"Firstname\" , firstName)\r",
+							"\r",
+							"//Middle_Name\r",
+							"var middlename = pm.variables.replaceIn(\"{{$randomNamePrefix}}\")\r",
+							"console.log(\"Middle Name is: \"+middlename)\r",
+							"pm.environment.set(\"middlename\" , middlename)\r",
+							"\r",
+							"//Last_Name\r",
+							"var lastName = pm.variables.replaceIn(\"{{$randomLastName}}\")\r",
+							"console.log(\"Last Name is: \"+lastName)\r",
+							"pm.environment.set(\"Lastname\" , lastName)\r",
+							"\r",
+							"//Dateof_birth\r",
+							"const moment = require(\"moment\");\r",
+							"const today = moment();\r",
+							"const twentyYearsAgo = today.clone().subtract(20, 'years');\r",
+							"console.log(twentyYearsAgo.format(\"YYYY-MM-DD\"));\r",
+							"pm.environment.set(\"birthday\", twentyYearsAgo.format(\"YYYY-MM-DD\"));\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"first_name\": \"{{Firstname}}\",\r\n  \"middle_name\": \"{{middlename}}\",\r\n  \"last_name\": \"{{Lastname}}\",\r\n  \"date_of_birth\": \"{{birthday}}\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/studentsDetails",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"studentsDetails"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "specific_student",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var statuscode = pm.response.code\r",
+							"console.log(statuscode)\r",
+							"\r",
+							"if(statuscode==200){\r",
+							"var jsonData = pm.response.json();\r",
+							"\r",
+							"pm.test(\"check Status code\", function () {\r",
+							"    pm.response.to.have.status(200)\r",
+							"})\r",
+							"\r",
+							"pm.test(\"firstname validation\", function(){\r",
+							"    pm.expect(jsonData.firstName).to.eql(pm.environment.get(\"firstName\"))\r",
+							"})\r",
+							"\r",
+							"pm.test(\"middlename validation\", function(){\r",
+							"    pm.expect(jsonData.Middlename).to.eql(pm.environment.get(\"Middlename\"))\r",
+							"})\r",
+							"\r",
+							"pm.test(\"lastname validation\", function(){\r",
+							"    pm.expect(jsonData.lastName).to.eql(pm.environment.get(\"lastName\"))\r",
+							"})\r",
+							"pm.test(\"Birthday\", function(){\r",
+							"    pm.expect(jsonData.Birthday).to.eql(pm.environment.get(\"Birthday\"))\r",
+							"\r",
+							"})\r",
+							"\r",
+							"}\r",
+							"\r",
+							"else if(statuscode==404){\r",
+							"    pm.test(\"NOT FOUND\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});\r",
+							"\r",
+							"}else if(statuscode==403){\r",
+							"    pm.test(\"FORBIDDEN\", function(){\r",
+							"        pm.response.to.have.status(403);\r",
+							"    })\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/studentsDetails/{{id}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"studentsDetails",
+						"{{id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "student_details",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json()\r",
+							"console.log(jsonData.length)\r",
+							"\r",
+							"/*for(i=0; i<jsonData.length; i++){\r",
+							"\r",
+							"    if(jsonData[i].id==7782401){\r",
+							"        console.log(jsonData[i].id)\r",
+							"        console.log(jsonData[i].first_name)\r",
+							"        console.log(jsonData[i].last_name)\r",
+							"        console.log(jsonData[i].date_of_birth)\r",
+							"        break;\r",
+							"    \r",
+							"    }\r",
+							"    \r",
+							"\r",
+							"}\r",
+							"*/\r",
+							"\r",
+							"let id = []\r",
+							"\r",
+							"for(i=0; i<jsonData.length; i++){\r",
+							"id[i] = jsonData[i].id\r",
+							"\r",
+							"}\r",
+							"console.log(id)\r",
+							"pm.environment.set(\"stdIDList\", id)\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/studentsDetails",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"studentsDetails"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
